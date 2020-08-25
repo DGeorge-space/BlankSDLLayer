@@ -5,17 +5,18 @@ class Draw
 {
 
 private:
+
+
+public:
     Uint32 lifetime;
-    const int dimming = 50;
+
     Uint8 red;
     Uint8 green;
 
     Uint8 blue;
+    int born;
 
-public:
-    int born = SDL_GetTicks();
-
-    bool isAlive = true;
+    bool isAlive;
 
     vector<int> xVals;
 
@@ -26,8 +27,8 @@ public:
     Draw();
     
     void setlifetime(int lifeTimeInTicks);
-    void circle(int x, int y, int radius);
     void checkAlive();
+    void kill();
     void setColours();
     void setColours(int red, int green, int blue);
     void reduceCol();
@@ -37,8 +38,9 @@ public:
 
 Draw::Draw()
 {
-    int randLifetime = rand() % 2000;
-    setlifetime(500);
+    lifetime = rand() % 2000+1;
+    isAlive= true;
+    born= SDL_GetTicks();
     
     setColours();
     xVals;
@@ -51,40 +53,34 @@ void Draw::setlifetime(int lifeTimeInTicks)
 }
 
 void Draw::checkAlive(){
-    if(lifetime>SDL_GetTicks()-born){
-        isAlive=false;
+    if(lifetime<SDL_GetTicks()-born){
+        kill();
+
     }
 }
 
-void Draw::circle(int x, int y, int radius)
-{
-    const float PI = 3.14159265;
-
-    for (int i = 0; i < 361; i++)
-    {
-        int xp = x + radius * cos((i * PI) / 180);
-        int yp = y + radius * sin((i * PI) / 180);
-
-        xVals.push_back(xp);
-        yVals.push_back(yp);
-    }
+void Draw::kill(){
+    isAlive=false;
+    setColours(0,0,0);
 }
+
+
 
 void Draw::setColours()
 {
 
-    int randR = rand() % 256 + 1;
-    int randG = rand() % 256 + 1;
-    int randB = rand() % 256 + 1;
+    int randR = rand() % 100 + 100;
+    int randG = rand() % 155 + 100;
+    int randB = rand() % 155 + 100;
     green = randG;
     red = randR;
     blue = randB;
 }
 void Draw::setColours(int redInt, int greenInt, int blueInt)
 {
-    red = redInt;
-    blue = blueInt;
-    green = greenInt;
+    this->red = redInt;
+    this->blue = blueInt;
+    this->green = greenInt;
 }
 
 void Draw::reduceCol()

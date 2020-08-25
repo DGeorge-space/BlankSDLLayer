@@ -1,45 +1,55 @@
-#include "Draw.h"
+#include "Circle.h"
 
-class Animate : Screen
+class Animate : public Circle
 {
 private:
-    Draw draw;
-    int born=1000;
 
+
+int maxRad;
+int numCircles;
+static Circle *circles[numCircles];
+public:
+Screen screen;
 public:
     void expandingCircle(Screen screen);
     Animate();
+    void randomDraw();
     ~Animate();
 };
 
 Animate::Animate()
 {
-    Draw draw;
-    //born = SDL_GetTicks();
-    draw.setlifetime(100);
+    
+    numCircles = rand() % 100 + 1;
+    for (int i = 0; i < numCircles; i++)
+    {
+        circles[i] = new Circle(); 
+        
+    }
 
 
+}
+void Animate::randomDraw(){
+     for (int i = 0; i < numCircles; i++)
+        {
+            
+            circles[i]->checkAlive();
+            
+            if(circles[i]->isAlive==false){
+                circles[i]->output(screen);
+                circles[i] = new Circle();
+                
+            }
+            circles[i]->output(screen);
+            screen.update();
+            
+        }
 }
 
 void Animate::expandingCircle(Screen screen)
 {
 
-    int randX = rand() % ScreenWidth + 1;
-    int randY = rand() % ScreenHeight/2 +0 ;
-    int randRad = rand() % 50 + 1;
-    int itCount = 0;
-    for (int i = 0; i < randRad; i++)
-    {
-        //int timeAlive= SDL_GetTicks()-born;
-        draw.circle(randX, randY, i);
-        draw.reduceCol();
-        draw.output(screen);
-        
-         
-    }
-    
-    draw.output(screen);
-    
+
     
     
      
@@ -47,5 +57,6 @@ void Animate::expandingCircle(Screen screen)
 
 Animate::~Animate()
 {
+    delete[] circles;
 
 }

@@ -31,7 +31,7 @@ public:
     void setPixel(int x, int y, Uint8 red, Uint8 green, Uint8 blue);
     bool processEvents();
     void close();
-    void boxBlur();
+    
     bool loadMedia(char relativeMediaDirectory[]);
 };
 
@@ -55,7 +55,7 @@ bool Screen::init()
     else
     {
         //create the window
-        window = SDL_CreateWindow("SDL2 Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, ScreenWidth, ScreenHeight, SDL_WINDOW_SHOWN);
+        window = SDL_CreateWindow("Circles everywhere", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, ScreenWidth, ScreenHeight, SDL_WINDOW_SHOWN);
         if (window == NULL)
         {
             printf("Window could not be created! SDL_Error: %s\n", SDL_GetError);
@@ -112,6 +112,7 @@ bool Screen::loadMedia(char relativeMediaDirectory[])
 }
 void Screen::update()
 {
+    //refresh the screen
     SDL_UpdateTexture(texture, NULL, buffer1, ScreenWidth * sizeof(Uint32));
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, texture, NULL, NULL);
@@ -119,7 +120,7 @@ void Screen::update()
 }
 void Screen::setPixel(int x, int y, Uint8 red, Uint8 green, Uint8 blue)
 {
-    //stops plotting off the screen bounds~ can be problematic
+    //stops plotting off the screen bounds~ can be problematic since this means memory is being accessed that shouldn't be
     if (x < 0 || x >= ScreenWidth || y < 0 || y >= ScreenHeight)
     {
         return;
@@ -137,7 +138,7 @@ void Screen::setPixel(int x, int y, Uint8 red, Uint8 green, Uint8 blue)
 }
 
 bool Screen::processEvents()
-{
+{//does event handling for inputs, currently the only event is to quit
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
@@ -148,48 +149,7 @@ bool Screen::processEvents()
     }
     return true;
 }
-void Screen::boxBlur(){
-	//swap buffers so pixel is in buffer w and we are drawing to buffer 1
-	Uint32 *temp = buffer1;
-	buffer1 =buffer2;
-	buffer2 =temp;
 
-	for (int y=0; y<ScreenHeight; y++){
-		for(int x=0; x<ScreenWidth; x++){
-			/*
-			 * 0 0 0	sum over colour vals adjacent pixels and divide by near neighbours
-			 * 0 1 0
-			 * 0 0 0
-			 */
-			int redTotal=0;
-			int greenTotal=0;
-			int blueTotal=0;
-			for(int row=-1;row<=1;row++){
-				for(int col=-1; col<=1;col++){
-					int currentX = x + col;
-					int currentY = y + row;
-
-					if(currentX >=0 && currentX< ScreenHeight && currentY >=0 && currentY< ScreenHeight){
-						Uint32 color = buffer2[currentY*ScreenWidth+currentX];
-						Uint8 red = color >> 24;
-						Uint8 green = color >> 16;
-						Uint8 blue = color >> 8;
-
-						redTotal+=red;
-						greenTotal += green;
-						blueTotal += blue;
-
-					}
-				}
-			}
-			Uint8 red = redTotal/9;
-			Uint8 green= greenTotal/9;
-			Uint8 blue = blueTotal/9;
-
-			setPixel(x,y,red,green,blue);
-		}
-	}
-}
 
 void Screen::close()
 {
